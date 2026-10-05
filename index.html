@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tài Moto chuyên giới thiệu và kinh doanh mô tô nhập khẩu.">
+  <title>Tài Moto | Mô tô nhập khẩu</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <a href="#home" class="logo">TÀI <span>MOTO</span></a>
+
+  <button class="menu-btn" id="menuBtn" aria-label="Mở menu">
+    Menu
+  </button>
+
+  <nav id="navMenu">
+    <a href="#home">Trang chủ</a>
+    <a href="#cars">Mô tô đang bán</a>
+    <a href="#about">Giới thiệu</a>
+    <a href="#contact">Liên hệ</a>
+  </nav>
+
+  <button class="cart-toggle" id="cartToggle">
+    Giỏ hàng (<span id="cartCount">0</span>)
+  </button>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <p class="eyebrow">MOTORCYCLES COLLECTION</p>
+      <h1>Đam mê tốc độ.<br>Khẳng định chất riêng.</h1>
+      <p>
+        Khám phá những mẫu mô tô nhập khẩu dành cho
+        người yêu tốc độ và phong cách khác biệt.
+      </p>
+      <div class="hero-actions">
+        <a href="#cars" class="btn primary">Khám phá mô tô</a>
+        <a href="#contact" class="btn outline">Tư vấn mua xe</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div>
+      <strong>Mô tô nhập khẩu</strong>
+      <span>Nhiều dòng xe lựa chọn</span>
+    </div>
+    <div>
+      <strong>Tư vấn tận tâm</strong>
+      <span>Hỗ trợ chọn xe phù hợp</span>
+    </div>
+    <div>
+      <strong>Hỗ trợ mua bán</strong>
+      <span>Kết nối khách hàng</span>
+    </div>
+  </section>
+
+  <section class="section" id="cars">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">SẢN PHẨM</p>
+        <h2>Mô tô nổi bật</h2>
+        <p class="muted">Lựa chọn mẫu xe phù hợp với phong cách của bạn.</p>
+      </div>
+
+      <select id="sortCars" aria-label="Sắp xếp xe">
+        <option value="default">Sắp xếp mặc định</option>
+        <option value="low">Giá thấp đến cao</option>
+        <option value="high">Giá cao đến thấp</option>
+      </select>
+    </div>
+
+    <div class="filters">
+      <button class="filter active" data-filter="all">Tất cả xe</button>
+      <button class="filter" data-filter="sport">Sportbike</button>
+      <button class="filter" data-filter="naked">Naked Bike</button>
+      <button class="filter" data-filter="touring">Touring</button>
+    </div>
+
+    <div class="car-grid" id="carGrid"></div>
+
+    <p class="note">
+      Giá và thông tin xe hiện là dữ liệu minh họa.
+      Vui lòng cập nhật thông tin xe thực tế trước khi bán.
+    </p>
+  </section>
+
+  <section class="cart-section" id="cartSection">
+    <div class="section">
+      <p class="eyebrow">GIỎ HÀNG</p>
+      <h2>Giỏ hàng của bạn</h2>
+
+      <div id="cartItems">
+        <p class="muted">Giỏ hàng đang trống.</p>
+      </div>
+
+      <div class="cart-total">
+        Tổng tiền: <strong id="cartTotal">0 ₫</strong>
+      </div>
+
+      <button class="btn primary" id="checkoutBtn">
+        Tiến hành đặt hàng
+      </button>
+    </div>
+  </section>
+
+  <section class="checkout section" id="checkoutSection">
+    <p class="eyebrow">ĐẶT HÀNG</p>
+    <h2>Thông tin khách hàng</h2>
+    <p class="muted">
+      Điền thông tin để người bán liên hệ xác nhận đơn hàng.
+    </p>
+
+    <form id="checkoutForm" class="customer-form">
+      <label for="buyerName">Họ và tên *</label>
+      <input id="buyerName" name="name" autocomplete="name"
+        required placeholder="Nhập họ và tên">
+
+      <label for="buyerPhone">Số điện thoại *</label>
+      <input id="buyerPhone" name="phone" type="tel"
+        autocomplete="tel" required pattern="[0-9+ .-]{9,15}"
+        placeholder="Nhập số điện thoại">
+
+      <label for="buyerEmail">Email</label>
+      <input id="buyerEmail" name="email" type="email"
+        autocomplete="email" placeholder="Email của bạn">
+
+      <label for="buyerAddress">Địa chỉ *</label>
+      <textarea id="buyerAddress" name="address"
+        autocomplete="street-address" required
+        placeholder="Nhập địa chỉ liên hệ"></textarea>
+
+      <label for="paymentMethod">Phương thức thanh toán *</label>
+      <select id="paymentMethod" name="payment" required>
+        <option value="Thanh toán trực tiếp sau khi xác nhận">
+          Thanh toán trực tiếp sau khi xác nhận
+        </option>
+        <option value="Chuyển khoản sau khi xác nhận">
+          Chuyển khoản sau khi xác nhận
+        </option>
+      </select>
+
+      <label for="buyerNote">Ghi chú</label>
+      <textarea id="buyerNote" name="note"
+        placeholder="Thông tin bổ sung"></textarea>
+
+      <div id="checkoutSummary" class="checkout-summary">
+        Vui lòng thêm xe vào giỏ hàng.
+      </div>
+
+      <button class="btn primary" type="submit">
+        Xác nhận đặt hàng
+      </button>
+    </form>
+
+    <div id="orderResult" class="order-result"
+      role="status" hidden></div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="about-image">
+      <img
+        src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1000&q=85"
+        alt="Mô tô phân khối lớn"
+        loading="lazy">
+    </div>
+
+    <div class="about-content">
+      <p class="eyebrow">GIỚI THIỆU</p>
+      <h2>Không chỉ là chiếc xe.<br>Đó là đam mê.</h2>
+      <p>
+        Tài Moto hướng đến những người yêu mô tô và tìm kiếm
+        những mẫu xe nhập khẩu có phong cách riêng.
+        Chúng tôi hỗ trợ khách hàng tìm hiểu thông tin,
+        lựa chọn dòng xe và kết nối mua bán.
+      </p>
+
+      <ul>
+        <li>Tư vấn dòng xe theo nhu cầu và ngân sách</li>
+        <li>Hỗ trợ tìm hiểu giấy tờ và nguồn gốc xe</li>
+        <li>Hỗ trợ xem xe và thủ tục mua bán</li>
+      </ul>
+
+      <a href="#contact" class="btn primary">Liên hệ Tài Moto</a>
+    </div>
+  </section>
+
+  <section class="contact section" id="contact">
+    <p class="eyebrow">LIÊN HỆ</p>
+    <h2>Kết nối với Tài Moto</h2>
+    <p class="muted">
+      Gửi yêu cầu để được tư vấn về mô tô nhập khẩu.
+    </p>
+
+    <div class="contact-actions">
+      <a class="btn primary" id="callBtn" href="tel:0900000000">
+        Gọi điện
+      </a>
+      <a class="btn zalo-btn" id="zaloBtn"
+        href="https://zalo.me/84900000000"
+        target="_blank" rel="noopener">
+        Liên hệ qua Zalo
+      </a>
+    </div>
+
+    <form id="contactForm" class="customer-form contact-form">
+      <label for="contactName">Họ và tên *</label>
+      <input id="contactName" name="name" autocomplete="name"
+        required placeholder="Tên của bạn">
+
+      <label for="contactPhone">Số điện thoại *</label>
+      <input id="contactPhone" name="phone" type="tel"
+        autocomplete="tel" required pattern="[0-9+ .-]{9,15}"
+        placeholder="Số điện thoại">
+
+      <label for="contactEmail">Email</label>
+      <input id="contactEmail" name="email" type="email"
+        placeholder="Email của bạn">
+
+      <label for="contactMessage">Nội dung cần tư vấn *</label>
+      <textarea id="contactMessage" name="message" required
+        placeholder="Nội dung bạn cần tư vấn"></textarea>
+
+      <button class="btn primary" type="submit">
+        Gửi yêu cầu tư vấn
+      </button>
+
+      <p id="contactResult" class="muted" role="status"></p>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <a href="#home" class="logo">TÀI <span>MOTO</span></a>
+  <p>2026 Tài Moto. Mô tô nhập khẩu.</p>
+  <p><a href="admin/">Trang quản trị cửa hàng</a></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
