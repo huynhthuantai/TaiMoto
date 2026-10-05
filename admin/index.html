@@ -1,0 +1,1551 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quản trị Tài Moto</title>
+<style>
+:root{--dark:#171914;--gold:#c9a45f;--bg:#f4f5f2;--line:#e3e5df;--text:#242620;--red:#b83b35;--green:#26754c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;color:var(--text);background:var(--bg);font-size:14px}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--dark);color:white;padding:24px 15px;flex-shrink:0}
+.brand{font-size:23px;font-weight:bold;padding:8px 10px 25px}
+.brand span{color:var(--gold)}
+.side-label{font-size:11px;color:#a7a99f;padding:10px}
+.side-btn{display:block;width:100%;text-align:left;padding:13px 12px;border:0;background:transparent;color:#eee;border-radius:5px;margin:4px 0}
+.side-btn.active,.side-btn:hover{background:#34362e;color:var(--gold)}
+.main{flex:1;min-width:0}
+.topbar{background:white;padding:20px 28px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.topbar h1{font-size:21px;margin:0}
+.topbar p{color:#777;font-size:12px;margin:5px 0 0}
+.admin-tag{background:#f6eddc;color:#745722;padding:8px 12px;border-radius:4px;font-size:12px}
+.content{padding:26px;max-width:1500px;margin:auto}
+.page{display:none}
+.page.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:22px}
+.stat{background:white;border:1px solid var(--line);border-radius:7px;padding:20px}
+.stat p{margin:0 0 10px;color:#777;font-size:12px}
+.stat strong{font-size:25px;overflow-wrap:anywhere}
+.panel{background:white;border:1px solid var(--line);border-radius:7px;padding:22px;margin-bottom:20px;min-width:0}
+.panel h2{font-size:17px;margin:0 0 18px}
+.toolbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d9dcd4;border-radius:4px;background:white;min-width:0}
+textarea{min-height:85px;resize:vertical}
+label{display:block;font-size:12px;font-weight:bold;margin:12px 0 6px}
+.search{max-width:350px}
+.btn{border:0;border-radius:4px;padding:11px 15px;font-weight:bold;font-size:12px}
+.btn-primary{background:var(--dark);color:white}
+.btn-primary:hover{background:#373a31}
+.btn-gold{background:var(--gold);color:#171914}
+.btn-light{background:#eceee8;color:#333}
+.btn-danger{background:#fbe9e7;color:var(--red)}
+.btn-green{background:#e3f3e9;color:var(--green)}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
+.full{grid-column:1/-1}
+.table-wrap{overflow-x:auto;width:100%}
+table{border-collapse:collapse;width:100%;min-width:680px;text-align:left}
+th,td{padding:12px 10px;border-bottom:1px solid #eceee8;font-size:12px;vertical-align:middle}
+th{background:#f7f8f5;color:#686b63;font-weight:bold;white-space:nowrap}
+td img{width:65px;height:48px;object-fit:cover;border-radius:3px;background:#eee}
+td strong{font-size:12px}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions button{padding:7px 9px;font-size:11px}
+.status{display:inline-block;border-radius:4px;padding:5px 8px;font-size:11px;background:#eee}
+.status-new{background:#fff0d2;color:#805c13}
+.status-done{background:#e2f3e7;color:#26754c}
+.status-cancel{background:#fbe8e6;color:#a6322c}
+.product-row{display:flex;gap:10px;align-items:center}
+.muted{color:#777;font-size:12px}
+.empty{padding:25px;text-align:center;color:#777}
+.hidden{display:none!important}
+#adminLoginGate{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#171914,#34362e);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#fff;width:100%;max-width:390px;padding:30px;border-radius:10px;box-shadow:0 20px 70px #0005}
+.login-brand{text-align:center;font-size:25px;font-weight:bold;margin-bottom:8px;color:#171914}
+.login-brand span{color:#c9a45f}
+.login-card h1{text-align:center;font-size:20px;margin:12px 0 6px}
+.login-card p{text-align:center;color:#777;font-size:13px;line-height:1.5}
+.login-card .btn{width:100%;margin-top:16px;padding:13px}
+.login-error{color:#b83b35!important;min-height:18px;margin:10px 0 0!important}
+#logoutBtn{margin-left:8px;border:1px solid #ddd;background:#fff;border-radius:4px;padding:8px 10px;font-size:12px;cursor:pointer}
+@media(max-width:600px){.login-card{padding:24px}}
+.notice{padding:12px;background:#f9f2df;border:1px solid #eadbb2;border-radius:4px;font-size:12px;line-height:1.7;margin-bottom:20px}
+.preview{max-width:150px;max-height:100px;object-fit:contain;margin-top:10px;display:block}
+.mobile-menu{display:none}
+@media(max-width:850px){
+ .sidebar{width:185px}
+ .content{padding:15px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .panel{padding:15px}
+}
+@media(max-width:600px){
+ .layout{display:block}
+ .sidebar{width:100%;padding:12px}
+ .brand{padding:5px 8px 12px}
+ .side-label{display:none}
+ .nav-list{display:flex;gap:6px;overflow-x:auto}
+ .side-btn{width:auto;white-space:nowrap;padding:10px}
+ .topbar{padding:15px;align-items:flex-start}
+ .topbar h1{font-size:17px}
+ .admin-tag{font-size:10px}
+ .content{padding:12px}
+ .stats{gap:8px}
+ .stat{padding:13px}
+ .stat strong{font-size:20px}
+ .form-grid{grid-template-columns:1fr}
+ .full{grid-column:auto}
+ .search{max-width:none}
+}
+
+/* Responsive layout for phones, tablets and desktops */
+html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+.layout { width: 100%; }
+.main { flex: 1 1 0; min-width: 0; width: 0; }
+.sidebar { flex: 0 0 230px; min-width: 0; }
+.topbar > div { min-width: 0; }
+.topbar > div:last-child { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.topbar > div:last-child #logoutBtn { margin-left:0; }
+.panel, .stat, .content, .page { min-width: 0; }
+.table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { min-width: 680px; }
+img { max-width: 100%; }
+@media (max-width: 1000px) {
+  .layout { display: block !important; min-height: 100vh; }
+  .sidebar { width: 100% !important; padding: 12px !important; }
+  .brand { padding: 5px 8px 12px !important; }
+  .side-label { display: none; }
+  .nav-list { display:flex; gap:6px; overflow-x:auto; max-width:100%; padding-bottom:4px; -webkit-overflow-scrolling:touch; }
+  .side-btn { display:block; width:auto; flex:0 0 auto; white-space:nowrap; padding:11px 13px; margin:0; }
+  .main { width:100% !important; min-width:0; }
+  .topbar { padding:14px 16px; align-items:center; flex-wrap:wrap; }
+  .topbar h1 { font-size:18px; }
+  .topbar p { line-height:1.4; }
+  .content { padding:14px !important; }
+  .stats { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px; }
+  .stat { padding:13px; }
+  .stat strong { font-size:20px; }
+  .panel { padding:14px; }
+  .form-grid { grid-template-columns:1fr !important; }
+  .full { grid-column:auto !important; }
+  .search { max-width:100%; }
+  .notice { overflow-wrap:anywhere; }
+}
+@media (max-width: 420px) {
+  .topbar { align-items:flex-start; }
+  .topbar > div:last-child { width:100%; }
+  .admin-tag { font-size:10px; padding:7px 9px; }
+  #logoutBtn { padding:8px 10px; }
+  .stats { grid-template-columns:1fr 1fr !important; }
+  .stat p { font-size:11px; }
+  .stat strong { font-size:18px; }
+  .login-card { padding:22px !important; }
+}
+
+
+.mobile-menu-btn{display:none;border:1px solid var(--line);background:white;border-radius:5px;padding:9px 12px;font-weight:bold;color:var(--text)}
+.menu-overlay{display:none}
+@media(max-width:1000px){
+  .mobile-menu-btn{display:inline-block}
+  .layout{display:flex!important;min-height:100vh}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:280px!important;z-index:1001;transform:translateX(-105%);transition:transform .2s ease;overflow-y:auto}
+  .layout.menu-open .sidebar{transform:translateX(0)}
+  .menu-overlay{position:fixed;inset:0;background:#0007;z-index:1000}
+  body.menu-open .menu-overlay{display:block}
+  .main{width:100%!important}
+  .nav-list{display:block!important;overflow:visible!important}
+  .side-btn{width:100%!important;display:block!important;text-align:left!important}
+}
+</style>
+</head>
+<body>
+<div id="adminLoginGate">
+  <form class="login-card" id="adminLoginForm">
+    <div class="login-brand">TÀI <span>MOTO</span></div>
+    <h1>Đăng nhập quản trị</h1>
+    <p>Vui lòng nhập mật khẩu để truy cập trang quản trị cửa hàng.</p>
+    <label for="adminPassword">Mật khẩu quản trị</label>
+    <input id="adminPassword" type="password" autocomplete="current-password" required placeholder="Nhập mật khẩu" autofocus>
+    <button class="btn btn-primary" type="submit">Đăng nhập</button>
+    <p class="login-error" id="loginError" role="alert"></p>
+    <p><a href="../index.html">Quay lại trang bán hàng</a></p>
+  </form>
+</div>
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="layout" id="adminApp" style="display:none">
+<aside class="sidebar">
+  <div class="brand"><a href="../index.html" style="color:inherit;text-decoration:none">TÀI <span>MOTO</span></a></div>
+  <p style="margin:0 0 14px 8px;font-size:12px"><a href="../index.html" style="color:inherit">Xem trang bán hàng</a></p>
+  <div class="side-label">QUẢN LÝ CỬA HÀNG</div>
+  <div class="nav-list">
+    <button class="side-btn active" data-page="overview">Tổng quan</button>
+    <button class="side-btn" data-page="products">Sản phẩm</button>
+    <button class="side-btn" data-page="categories">Danh mục xe</button>
+    <button class="side-btn" data-page="posts">Bài viết</button>
+    <button class="side-btn" data-page="ai">AI SEO</button>
+    <button class="side-btn" data-page="orders">Đơn hàng</button>
+    <button class="side-btn" data-page="customers">Khách hàng</button>
+    <button class="side-btn" data-page="coupons">Mã giảm giá</button>
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">Mở menu</button>
+  <div>
+    <h1 id="pageTitle">Tổng quan</h1>
+    <p>Hệ thống quản trị cửa hàng mô tô nhập khẩu</p>
+  </div>
+  <div><span class="admin-tag">QUẢN TRỊ</span><button id="logoutBtn" type="button">Đăng xuất</button></div>
+</header>
+
+<div class="content">
+<div class="notice">
+  Bản thử nghiệm lưu dữ liệu trên trình duyệt hiện tại. Chưa có đăng nhập bảo mật, máy chủ hoặc đồng bộ giữa các thiết bị. Không dùng bản này để lưu dữ liệu khách hàng thật trước khi kết nối hệ thống máy chủ.
+</div>
+
+<section class="page active" id="overview">
+  <div class="stats">
+    <div class="stat"><p>Tổng sản phẩm</p><strong id="statProducts">0</strong></div>
+    <div class="stat"><p>Tổng đơn hàng</p><strong id="statOrders">0</strong></div>
+    <div class="stat"><p>Khách hàng</p><strong id="statCustomers">0</strong></div>
+    <div class="stat"><p>Doanh thu đơn đã hoàn tất</p><strong id="statRevenue">0 đ</strong></div>
+  </div>
+  <div class="panel">
+    <h2>Đơn hàng gần đây</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Ngày tạo</th><th>Tổng tiền</th><th>Trạng thái</th></tr></thead>
+        <tbody id="recentOrders"></tbody>
+      </table>
+    </div>
+    <p class="muted">Đơn hàng sẽ xuất hiện tại đây khi website bán hàng được kết nối để lưu đơn.</p>
+  </div>
+</section>
+
+<section class="page" id="products">
+  <div class="panel">
+    <h2 id="productFormTitle">Thêm sản phẩm mới</h2>
+    <form id="productForm">
+      <input type="hidden" id="productId">
+      <div class="form-grid">
+        <div>
+          <label for="productName">Tên mô tô *</label>
+          <input id="productName" required placeholder="Ví dụ: Sportbike 1000">
+        </div>
+        <div>
+          <label for="productPrice">Giá bán (VNĐ) *</label>
+          <input id="productPrice" type="number" min="1" required placeholder="520000000">
+        </div>
+        <div>
+          <label for="productSku">Mã sản phẩm</label>
+          <input id="productSku" maxlength="60" placeholder="TM-001">
+        </div>
+        <div>
+          <label for="productBrand">Thương hiệu</label>
+          <input id="productBrand" maxlength="80" placeholder="Honda, Yamaha, BMW...">
+        </div>
+        <div>
+          <label for="productCondition">Tình trạng</label>
+          <select id="productCondition">
+            <option value="new">Xe mới</option>
+            <option value="used">Xe đã qua sử dụng</option>
+            <option value="importing">Đang về</option>
+          </select>
+        </div>
+        <div>
+          <label for="productStock">Tồn kho</label>
+          <input id="productStock" type="number" min="0" step="1" placeholder="1">
+        </div>
+        <div>
+          <label for="productColor">Màu sắc</label>
+          <input id="productColor" maxlength="120" placeholder="Đen, trắng, xanh...">
+        </div>
+        <div>
+          <label for="productEngine">Dung tích / động cơ</label>
+          <input id="productEngine" maxlength="120" placeholder="999cc, 4 xy-lanh...">
+        </div>
+        <div>
+          <label for="productType">Phân loại *</label>
+          <select id="productType" required></select>
+          <p class="muted">Danh mục được quản lý tại mục “Danh mục xe”.</p>
+        </div>
+        <div>
+          <label for="productYear">Năm sản xuất</label>
+          <input id="productYear" type="number" min="1900" max="2100" placeholder="2025">
+        </div>
+        <div class="full">
+          <label for="productImageFile">Hình ảnh xe</label>
+          <input id="productImageFile" type="file" accept="image/*">
+          <img id="imagePreview" class="preview hidden" alt="Xem trước hình ảnh">
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-light" type="button" id="removeProductImage">Xóa ảnh</button>
+          </div>
+          <p class="muted">Chọn ảnh trực tiếp từ iPhone/điện thoại. Hệ thống tự nén ảnh và lưu vào trình duyệt, không cần dán link.</p>
+        </div>
+        <div class="full">
+          <label for="productDescription">Mô tả sản phẩm</label>
+          <textarea id="productDescription" placeholder="Thông tin động cơ, màu sắc, tình trạng xe..."></textarea>
+        </div>
+        <div class="full">
+          <label><input type="checkbox" id="productActive" checked style="width:auto"> Đang kinh doanh</label>
+          <label><input type="checkbox" id="productFeatured" style="width:auto"> Sản phẩm nổi bật</label>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Lưu sản phẩm</button>
+      <button class="btn btn-light" type="button" id="cancelProductEdit">Làm mới</button>
+    </form>
+  </div>
+  <div class="panel">
+    <div class="toolbar">
+      <h2>Danh sách sản phẩm</h2>
+      <input class="search" id="productSearch" placeholder="Tìm theo tên sản phẩm">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Hình ảnh</th><th>Tên sản phẩm</th><th>Mã</th><th>Phân loại</th><th>Giá bán</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+        <tbody id="productRows"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="page" id="categories">
+  <div class="panel">
+    <h2 id="categoryFormTitle">Thêm danh mục loại xe</h2>
+    <form id="categoryForm" class="form-grid">
+      <input type="hidden" id="categoryId">
+      <div>
+        <label for="categoryName">Tên danh mục *</label>
+        <input id="categoryName" required maxlength="50" placeholder="Ví dụ: Cruiser, Adventure, Scooter">
+      </div>
+      <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="categorySubmit" type="submit">Thêm danh mục</button>
+        <button class="btn btn-light" id="cancelCategoryEdit" type="button">Làm mới</button>
+      </div>
+    </form>
+    <p class="muted">Danh mục thêm hoặc xóa tại đây sẽ cập nhật bộ lọc trên trang bán hàng. Không thể xóa danh mục đang được sản phẩm sử dụng.</p>
+  </div>
+  <div class="panel">
+    <h2>Danh sách danh mục loại xe</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tên danh mục</th><th>Mã danh mục</th><th>Số sản phẩm</th><th>Thao tác</th></tr></thead>
+        <tbody id="categoryRows"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="posts">
+  <div class="panel">
+    <h2 id="postFormTitle">Thêm bài viết mới</h2>
+    <form id="postForm">
+      <input type="hidden" id="postId">
+      <div class="form-grid">
+        <div>
+          <label for="postTitle">Tiêu đề *</label>
+          <input id="postTitle" required maxlength="180" placeholder="Ví dụ: Kinh nghiệm chọn mô tô cho người mới">
+        </div>
+        <div>
+          <label for="postCategory">Danh mục bài viết</label>
+          <input id="postCategory" maxlength="80" placeholder="Tin tức, Kiến thức xe, Tư vấn mua xe">
+        </div>
+        <div>
+          <label for="postKeyword">Từ khóa SEO</label>
+          <input id="postKeyword" maxlength="180" placeholder="kinh nghiệm chọn mô tô">
+        </div>
+        <div>
+          <label for="postSlug">Đường dẫn bài viết</label>
+          <input id="postSlug" maxlength="180" placeholder="kinh-nghiem-chon-mo-to">
+        </div>
+        <div class="full">
+          <label for="postMeta">Mô tả SEO</label>
+          <textarea id="postMeta" maxlength="320" placeholder="Mô tả ngắn hiển thị cho SEO và phần giới thiệu bài viết"></textarea>
+        </div>
+        <div>
+          <label for="postStatus">Trạng thái</label>
+          <select id="postStatus">
+            <option value="draft">Bản nháp</option>
+            <option value="published">Đã xuất bản</option>
+          </select>
+        </div>
+        <div>
+          <label for="postImageUrl">Ảnh đại diện bằng đường dẫn</label>
+          <input id="postImageUrl" type="url" placeholder="https://...">
+        </div>
+        <div class="full">
+          <label for="postImageFile">Ảnh đại diện từ thiết bị</label>
+          <input id="postImageFile" type="file" accept="image/*">
+          <img id="postImagePreview" class="preview hidden" alt="Xem trước ảnh bài viết">
+          <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-light" type="button" id="removePostImage">Xóa ảnh</button>
+          </div>
+          <p class="muted">Có thể chọn ảnh từ iPhone, Thư viện ảnh hoặc Tệp. Ảnh sẽ được nén trước khi lưu.</p>
+        </div>
+        <div class="full">
+          <label for="postContent">Nội dung bài viết *</label>
+          <textarea id="postContent" required style="min-height:260px" placeholder="Nhập nội dung bài viết. Có thể dùng HTML đơn giản như &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;."></textarea>
+          <p class="muted">Nội dung được hiển thị trực tiếp trên trang bài viết. Chỉ dùng HTML bạn tin cậy.</p>
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Lưu bài viết</button>
+      <button class="btn btn-gold" type="button" id="openAIFromPost">Tạo bằng AI SEO</button>
+      <button class="btn btn-light" type="button" id="cancelPostEdit">Làm mới</button>
+    </form>
+  </div>
+  <div class="panel">
+    <div class="toolbar">
+      <h2>Danh sách bài viết</h2>
+      <input class="search" id="postSearch" placeholder="Tìm theo tiêu đề, danh mục hoặc từ khóa">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ảnh</th><th>Tiêu đề</th><th>Danh mục</th><th>Trạng thái</th><th>Ngày cập nhật</th><th>Thao tác</th></tr></thead>
+        <tbody id="postRows"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="ai">
+  <div class="panel">
+    <h2>AI SEO</h2>
+    <p class="muted">Tạo nhanh tiêu đề, mô tả SEO, slug và nội dung bài viết từ chủ đề. Kết quả là bản nháp để bạn kiểm tra trước khi xuất bản.</p>
+    <div class="form-grid">
+      <div class="full">
+        <label for="aiTopic">Chủ đề hoặc tiêu đề *</label>
+        <input id="aiTopic" placeholder="Ví dụ: Kinh nghiệm chọn mô tô cho người mới">
+      </div>
+      <div>
+        <label for="aiKeyword">Từ khóa chính</label>
+        <input id="aiKeyword" placeholder="Ví dụ: mô tô cho người mới">
+      </div>
+      <div>
+        <label for="aiAudience">Đối tượng</label>
+        <input id="aiAudience" value="người yêu mô tô">
+      </div>
+      <div>
+        <label for="aiTone">Giọng văn</label>
+        <select id="aiTone">
+          <option>Chuyên nghiệp</option>
+          <option>Thân thiện</option>
+          <option>Kỹ thuật</option>
+        </select>
+      </div>
+      <div>
+        <label for="aiLength">Độ dài</label>
+        <select id="aiLength">
+          <option>Trung bình</option>
+          <option>Dài</option>
+          <option>Chuyên sâu</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions" style="margin-top:16px">
+      <button class="btn btn-gold" type="button" id="generateAI">Tạo nội dung SEO</button>
+      <button class="btn btn-light" type="button" id="clearAI">Làm mới</button>
+    </div>
+  </div>
+  <div class="panel hidden" id="aiResult">
+    <h2>Kết quả AI SEO</h2>
+    <label>Tiêu đề SEO</label>
+    <input id="aiResultTitle">
+    <label>Slug</label>
+    <input id="aiResultSlug">
+    <label>Mô tả SEO</label>
+    <textarea id="aiResultMeta"></textarea>
+    <label>Nội dung bài viết</label>
+    <textarea id="aiResultContent" style="min-height:360px"></textarea>
+    <div class="actions" style="margin-top:14px">
+      <button class="btn btn-primary" type="button" id="useAIResult">Đưa vào Bài viết</button>
+      <button class="btn btn-light" type="button" id="copyAIResult">Sao chép nội dung</button>
+    </div>
+  </div>
+
+<section class="page" id="orders">
+  <div class="panel">
+    <div class="toolbar">
+      <h2>Quản lý đơn hàng</h2>
+      <input class="search" id="orderSearch" placeholder="Tìm mã đơn, tên hoặc số điện thoại">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Ngày tạo</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+        <tbody id="orderRows"></tbody>
+      </table>
+    </div>
+    <p class="muted">Các đơn cần được website bán hàng gửi vào kho dữ liệu dùng chung mới xuất hiện tại đây.</p>
+  </div>
+  <div class="panel hidden" id="orderDetailPanel">
+    <h2>Chi tiết đơn hàng</h2>
+    <div id="orderDetail"></div>
+    <button class="btn btn-light" id="closeOrderDetail">Đóng chi tiết</button>
+  </div>
+</section>
+
+<section class="page" id="customers">
+  <div class="panel">
+    <div class="toolbar">
+      <h2>Danh sách khách hàng</h2>
+      <input class="search" id="customerSearch" placeholder="Tìm tên, số điện thoại, email">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Họ tên</th><th>Số điện thoại</th><th>Email</th><th>Địa chỉ</th><th>Số đơn</th></tr></thead>
+        <tbody id="customerRows"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="coupons">
+  <div class="panel">
+    <h2 id="couponFormTitle">Tạo mã giảm giá</h2>
+    <form id="couponForm">
+      <input type="hidden" id="couponId">
+      <div class="form-grid">
+        <div>
+          <label for="couponCode">Mã giảm giá *</label>
+          <input id="couponCode" required placeholder="TAIMOTO10">
+        </div>
+        <div>
+          <label for="couponType">Loại giảm giá</label>
+          <select id="couponType">
+            <option value="percent">Theo phần trăm (%)</option>
+            <option value="fixed">Số tiền cố định (VNĐ)</option>
+          </select>
+        </div>
+        <div>
+          <label for="couponValue">Giá trị giảm *</label>
+          <input id="couponValue" type="number" min="1" required>
+        </div>
+        <div>
+          <label for="couponMin">Đơn tối thiểu (VNĐ)</label>
+          <input id="couponMin" type="number" min="0" value="0">
+        </div>
+        <div>
+          <label for="couponExpiry">Ngày hết hạn</label>
+          <input id="couponExpiry" type="date">
+        </div>
+        <div>
+          <label for="couponUsage">Số lượt sử dụng tối đa</label>
+          <input id="couponUsage" type="number" min="1" placeholder="Không giới hạn nếu bỏ trống">
+        </div>
+      </div>
+      <button class="btn btn-primary" type="submit">Lưu mã giảm giá</button>
+      <button class="btn btn-light" type="button" id="cancelCouponEdit">Làm mới</button>
+    </form>
+  </div>
+  <div class="panel">
+    <h2>Danh sách mã giảm giá</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Mã</th><th>Loại</th><th>Giá trị</th><th>Đơn tối thiểu</th><th>Hết hạn</th><th>Lượt dùng</th><th>Thao tác</th></tr></thead>
+        <tbody id="couponRows"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</div>
+</main>
+</div>
+
+<script>
+// Mật khẩu cho bản thử nghiệm trên máy cá nhân. Đổi giá trị này nếu cần.
+// Lưu ý: đây không phải bảo mật thực sự vì mã nguồn HTML/JavaScript có thể xem được.
+const ADMIN_PASSWORD = "TaiMoto@123";
+const AUTH_KEY = "taiMotoAdminAuthenticated";
+
+const loginGate = document.getElementById("adminLoginGate");
+const adminApp = document.getElementById("adminApp");
+const loginForm = document.getElementById("adminLoginForm");
+const loginError = document.getElementById("loginError");
+
+function showAdminApp() {
+  loginGate.style.display = "none";
+  adminApp.style.display = "flex";
+}
+
+loginForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const entered = document.getElementById("adminPassword").value;
+  if (entered === ADMIN_PASSWORD) {
+    sessionStorage.setItem(AUTH_KEY, "yes");
+    loginError.textContent = "";
+    showAdminApp();
+    document.getElementById("adminPassword").value = "";
+  } else {
+    loginError.textContent = "Mật khẩu không đúng. Vui lòng thử lại.";
+    document.getElementById("adminPassword").select();
+  }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  sessionStorage.removeItem(AUTH_KEY);
+  adminApp.style.display = "none";
+  loginGate.style.display = "flex";
+  loginForm.reset();
+  loginError.textContent = "Bạn đã đăng xuất.";
+  document.getElementById("adminPassword").focus();
+});
+
+if (sessionStorage.getItem(AUTH_KEY) === "yes") showAdminApp();
+
+const KEYS = {
+  products: "taiMotoProducts",
+  orders: "taiMotoOrders",
+  coupons: "taiMotoCoupons",
+  categories: "taiMotoCategories",
+  news: "taiMotoNews"
+};
+
+const $ = id => document.getElementById(id);
+
+function readData(key) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+const DEMO_PRODUCTS = [
+  {id:"P-DEMO-1",name:"Sportbike cao cấp",price:520000000,type:"sport",year:"2024",image:"https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=85",description:"600–1000cc · Động cơ xăng · Xe minh họa",active:true},
+  {id:"P-DEMO-2",name:"Naked Bike mạnh mẽ",price:380000000,type:"naked",year:"2024",image:"https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=900&q=85",description:"650–900cc · Động cơ xăng · Xe minh họa",active:true},
+  {id:"P-DEMO-3",name:"Touring đường dài",price:680000000,type:"touring",year:"2025",image:"https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=900&q=85",description:"900–1300cc · Động cơ xăng · Xe minh họa",active:true}
+];
+if (localStorage.getItem(KEYS.products) === null) {
+  localStorage.setItem(KEYS.products, JSON.stringify(DEMO_PRODUCTS));
+}
+const DEFAULT_CATEGORIES = [
+  {id:"sport", name:"Sportbike"},
+  {id:"naked", name:"Naked Bike"},
+  {id:"touring", name:"Touring"},
+  {id:"other", name:"Khác"}
+];
+if (localStorage.getItem(KEYS.categories) === null) writeData(KEYS.categories, DEFAULT_CATEGORIES);
+let categories = readData(KEYS.categories);
+let products = readData(KEYS.products);
+let orders = readData(KEYS.orders);
+let coupons = readData(KEYS.coupons);
+let posts = readData(KEYS.news);
+
+const money = value => Number(value || 0).toLocaleString("vi-VN") + " đ";
+const text = value => String(value ?? "");
+
+function cell(value) {
+  const td = document.createElement("td");
+  td.textContent = text(value);
+  return td;
+}
+
+function button(label, className, action) {
+  const el = document.createElement("button");
+  el.type = "button";
+  el.className = "btn " + className;
+  el.textContent = label;
+  el.addEventListener("click", action);
+  return el;
+}
+
+function imageElement(src, alt) {
+  const img = document.createElement("img");
+  img.alt = alt;
+  img.loading = "lazy";
+  img.src = src || "";
+  img.onerror = () => {
+    img.removeAttribute("src");
+    img.alt = "Chưa có ảnh";
+  };
+  return img;
+}
+
+function slugifyPost(value) {
+  return text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "bai-viet";
+}
+
+let selectedPostImageData = "";
+
+function resetPostForm() {
+  $("postForm").reset();
+  $("postId").value = "";
+  $("postStatus").value = "draft";
+  $("postFormTitle").textContent = "Thêm bài viết mới";
+  selectedPostImageData = "";
+  $("postImagePreview").classList.add("hidden");
+  $("postImagePreview").removeAttribute("src");
+  $("postImageFile").value = "";
+}
+
+$("postTitle").addEventListener("input", () => {
+  if (!$("postId").value && !$("postSlug").dataset.edited) $("postSlug").value = slugifyPost($("postTitle").value);
+});
+$("postSlug").addEventListener("input", () => { $("postSlug").dataset.edited = "1"; });
+$("postImageUrl").addEventListener("input", () => {
+  if ($("postImageUrl").value.trim() && !selectedPostImageData) {
+    $("postImagePreview").src = $("postImageUrl").value.trim();
+    $("postImagePreview").classList.remove("hidden");
+  }
+});
+$("postImageFile").addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const data = await compressImageFile(file, 1600, 0.78);
+    selectedPostImageData = data;
+    $("postImageUrl").value = "";
+    $("postImagePreview").src = data;
+    $("postImagePreview").classList.remove("hidden");
+  } catch (error) {
+    selectedPostImageData = "";
+    $("postImageFile").value = "";
+    alert(error.message || "Không đọc được ảnh.");
+  }
+});
+$("removePostImage").addEventListener("click", () => {
+  selectedPostImageData = "";
+  $("postImageFile").value = "";
+  $("postImageUrl").value = "";
+  $("postImagePreview").classList.add("hidden");
+  $("postImagePreview").removeAttribute("src");
+});
+$("cancelPostEdit").addEventListener("click", resetPostForm);
+
+$("postForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const id = $("postId").value || "N" + Date.now();
+  const title = $("postTitle").value.trim();
+  const category = $("postCategory").value.trim() || "Tin tức";
+  const keyword = $("postKeyword").value.trim();
+  const slug = slugifyPost($("postSlug").value.trim() || title);
+  const metaDescription = $("postMeta").value.trim();
+  const content = $("postContent").value.trim();
+  const status = $("postStatus").value;
+  const old = posts.find(n => n.id === id);
+  const image = selectedPostImageData || $("postImageUrl").value.trim() || old?.cover || "";
+  if (!title || !content) { alert("Vui lòng nhập tiêu đề và nội dung bài viết."); return; }
+  if (posts.some(n => n.slug === slug && n.id !== id)) { alert("Đường dẫn bài viết đã tồn tại. Hãy đổi đường dẫn."); return; }
+  const now = new Date().toISOString();
+  const post = {
+    id, title, keyword, slug, metaDescription, category, cover: image, content, status,
+    publishedAt: old?.publishedAt || (status === "published" ? now : ""),
+    updatedAt: now
+  };
+  const index = posts.findIndex(n => n.id === id);
+  if (index >= 0) posts[index] = post; else posts.unshift(post);
+  writeData(KEYS.news, posts);
+  resetPostForm();
+  renderAll();
+  alert("Đã lưu bài viết.");
+});
+
+function editPost(id) {
+  const n = posts.find(item => item.id === id); if (!n) return;
+  $("postId").value = n.id;
+  $("postTitle").value = n.title || "";
+  $("postCategory").value = n.category || "";
+  $("postKeyword").value = n.keyword || "";
+  $("postSlug").value = n.slug || "";
+  $("postSlug").dataset.edited = "1";
+  $("postMeta").value = n.metaDescription || n.excerpt || "";
+  $("postStatus").value = n.status || "draft";
+  $("postContent").value = n.content || "";
+  selectedPostImageData = "";
+  $("postImageFile").value = "";
+  $("postImageUrl").value = /^https?:\/\//.test(n.cover || "") ? n.cover : "";
+  if (n.cover) { $("postImagePreview").src = n.cover; $("postImagePreview").classList.remove("hidden"); }
+  else { $("postImagePreview").classList.add("hidden"); $("postImagePreview").removeAttribute("src"); }
+  $("postFormTitle").textContent = "Chỉnh sửa bài viết";
+  $("postForm").scrollIntoView({behavior:"smooth"});
+}
+
+function deletePost(id) {
+  if (!confirm("Bạn có chắc muốn xóa bài viết này?")) return;
+  posts = posts.filter(n => n.id !== id);
+  writeData(KEYS.news, posts);
+  if ($("postId").value === id) resetPostForm();
+  renderAll();
+}
+
+function renderPosts() {
+  const tbody = $("postRows"); if (!tbody) return;
+  tbody.replaceChildren();
+  const q = $("postSearch").value.trim().toLowerCase();
+  const filtered = posts.filter(n => [n.title,n.category,n.keyword,n.slug].some(v => text(v).toLowerCase().includes(q)));
+  filtered.forEach(n => {
+    const tr = document.createElement("tr");
+    const imageTd = document.createElement("td");
+    imageTd.appendChild(imageElement(n.cover, n.title));
+    tr.append(imageTd, cell(n.title), cell(n.category || "Tin tức"));
+    const statusTd = document.createElement("td");
+    const badge = document.createElement("span");
+    badge.className = "status " + (n.status === "published" ? "status-done" : "status-new");
+    badge.textContent = n.status === "published" ? "Đã xuất bản" : "Bản nháp";
+    statusTd.appendChild(badge); tr.appendChild(statusTd);
+    tr.appendChild(cell(n.updatedAt ? new Date(n.updatedAt).toLocaleDateString("vi-VN") : "Chưa có"));
+    const actionsTd = document.createElement("td"); const actions = document.createElement("div"); actions.className = "actions";
+    actions.append(button("Sửa", "btn-light", () => editPost(n.id)), button("Xóa", "btn-danger", () => deletePost(n.id)));
+    actionsTd.appendChild(actions); tr.appendChild(actionsTd); tbody.appendChild(tr);
+  });
+  if (!filtered.length) { const tr=document.createElement("tr"); const td=cell("Chưa có bài viết phù hợp."); td.colSpan=6; td.className="empty"; tr.appendChild(td); tbody.appendChild(tr); }
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[ch]));
+}
+
+function generateSEOArticle(topic, keyword, audience, tone, length) {
+  topic = topic.trim() || "Kinh nghiệm chọn mô tô";
+  keyword = keyword.trim() || topic;
+  audience = audience.trim() || "người yêu mô tô";
+  const safeTopic = escapeHTML(topic);
+  const safeKeyword = escapeHTML(keyword);
+  const safeAudience = escapeHTML(audience);
+  const title = topic.length > 55 ? topic.slice(0, 55).trim() : topic + " | Kinh nghiệm và tư vấn";
+  const meta = `Tìm hiểu ${keyword}: tiêu chí lựa chọn, kinh nghiệm sử dụng và những lưu ý quan trọng dành cho ${audience}. Xem hướng dẫn chi tiết từ Tài Moto.`.slice(0, 160);
+  const slug = slugifyPost(topic);
+  const depth = length === "Chuyên sâu" ? " chuyên sâu" : length === "Dài" ? " chi tiết" : " thực tế";
+  const content = `<p><strong>${safeTopic}</strong> là chủ đề được nhiều ${safeAudience} quan tâm. Bài viết này cung cấp hướng dẫn${depth}, tập trung vào những tiêu chí thực tế trước khi lựa chọn và sử dụng mô tô.</p>
+<h2>${safeKeyword}: Vì sao cần quan tâm?</h2>
+<p>Khi lựa chọn mô tô, không nên chỉ nhìn vào công suất hoặc thiết kế. Mục đích sử dụng, khả năng kiểm soát, chi phí vận hành, trang bị an toàn và nhu cầu di chuyển hằng ngày đều ảnh hưởng đến quyết định.</p>
+<h2>Các tiêu chí cần kiểm tra</h2>
+<p>Hãy xem xét động cơ, trọng lượng, chiều cao yên, hệ thống phanh, lốp, hệ thống điện, phụ tùng, khả năng bảo dưỡng và ngân sách tổng thể. Với xe nhập khẩu, cần kiểm tra thêm nguồn gốc, giấy tờ và lịch sử sử dụng.</p>
+<h2>Kinh nghiệm lựa chọn</h2>
+<p>Nên so sánh nhiều mẫu xe trong cùng phân khúc, xác định ngân sách thực tế và ưu tiên chiếc xe phù hợp với khả năng kiểm soát. Nếu có điều kiện, hãy lái thử trước khi quyết định.</p>
+<h2>Câu hỏi thường gặp</h2>
+<h3>${safeKeyword} có phù hợp người mới không?</h3>
+<p>Điều này phụ thuộc vào dung tích, trọng lượng, chiều cao yên và kỹ năng của người lái. Người mới nên ưu tiên khả năng kiểm soát và tư thế lái phù hợp.</p>
+<h3>Cần kiểm tra gì trước khi mua?</h3>
+<p>Kiểm tra nguồn gốc, giấy tờ, động cơ, khung sườn, phanh, lốp, hệ thống điện và lịch sử bảo dưỡng.</p>
+<h2>Kết luận</h2>
+<p>Chọn mô tô hiệu quả là bài toán cân bằng giữa nhu cầu, ngân sách và trải nghiệm. Tài Moto có thể hỗ trợ tư vấn mẫu xe phù hợp với nhu cầu thực tế của khách hàng.</p>`;
+  return {title, meta, slug, content, keyword, category:"Tin tức mô tô", status:"draft", cover:""};
+}
+
+function fillAIFromPost() {
+  $("aiTopic").value = $("postTitle").value.trim();
+  $("aiKeyword").value = $("postKeyword").value.trim();
+  showPage("ai", "AI SEO");
+  closeMobileMenu();
+}
+
+$("openAIFromPost").addEventListener("click", fillAIFromPost);
+$("generateAI").addEventListener("click", () => {
+  const topic = $("aiTopic").value.trim();
+  if (!topic) { alert("Vui lòng nhập chủ đề hoặc tiêu đề."); $("aiTopic").focus(); return; }
+  const result = generateSEOArticle(topic, $("aiKeyword").value, $("aiAudience").value, $("aiTone").value, $("aiLength").value);
+  $("aiResultTitle").value = result.title;
+  $("aiResultSlug").value = result.slug;
+  $("aiResultMeta").value = result.meta;
+  $("aiResultContent").value = result.content;
+  $("aiResult").classList.remove("hidden");
+  $("aiResult").scrollIntoView({behavior:"smooth", block:"start"});
+});
+$("clearAI").addEventListener("click", () => {
+  $("aiTopic").value = ""; $("aiKeyword").value = ""; $("aiAudience").value = "người yêu mô tô";
+  $("aiResult").classList.add("hidden");
+  $("aiResultTitle").value = ""; $("aiResultSlug").value = ""; $("aiResultMeta").value = ""; $("aiResultContent").value = "";
+});
+$("useAIResult").addEventListener("click", () => {
+  $("postId").value = "";
+  $("postTitle").value = $("aiResultTitle").value;
+  $("postCategory").value = "Tin tức mô tô";
+  $("postKeyword").value = $("aiKeyword").value.trim() || $("aiTopic").value.trim();
+  $("postSlug").value = $("aiResultSlug").value;
+  $("postSlug").dataset.edited = "1";
+  $("postMeta").value = $("aiResultMeta").value;
+  $("postStatus").value = "draft";
+  $("postContent").value = $("aiResultContent").value;
+  $("postFormTitle").textContent = "Thêm bài viết từ AI SEO";
+  showPage("posts", "Quản lý bài viết");
+  closeMobileMenu();
+  $("postForm").scrollIntoView({behavior:"smooth", block:"start"});
+});
+$("copyAIResult").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("aiResultContent").value); alert("Đã sao chép nội dung bài viết."); }
+  catch { alert("Không thể tự sao chép trên trình duyệt này."); }
+});
+
+function showPage(page, title) {
+  document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+  $(page).classList.add("active");
+  document.querySelectorAll(".side-btn").forEach(el => {
+    el.classList.toggle("active", el.dataset.page === page);
+  });
+  $("pageTitle").textContent = title;
+}
+
+const mobileMenuBtn = $("mobileMenuBtn");
+const menuOverlay = $("menuOverlay");
+function closeMobileMenu(){ document.body.classList.remove("menu-open"); $("adminApp").classList.remove("menu-open"); }
+mobileMenuBtn.addEventListener("click",()=>{ document.body.classList.toggle("menu-open"); $("adminApp").classList.toggle("menu-open"); });
+menuOverlay.addEventListener("click",closeMobileMenu);
+document.querySelectorAll(".side-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const names = {
+      overview: "Tổng quan",
+      products: "Quản lý sản phẩm",
+      categories: "Danh mục loại xe",
+      posts: "Quản lý bài viết",
+      ai: "AI SEO",
+      orders: "Quản lý đơn hàng",
+      customers: "Quản lý khách hàng",
+      coupons: "Mã giảm giá"
+    };
+    showPage(btn.dataset.page, names[btn.dataset.page]);
+    renderAll();
+    closeMobileMenu();
+  });
+});
+
+
+function categoryName(id) {
+  return categories.find(c => c.id === id)?.name || id || "Khác";
+}
+function renderCategoryOptions(selectedId) {
+  const select = $("productType");
+  if (!select) return;
+  select.replaceChildren();
+  categories.forEach(c => {
+    const option = document.createElement("option");
+    option.value = c.id;
+    option.textContent = c.name;
+    select.appendChild(option);
+  });
+  if (selectedId && categories.some(c => c.id === selectedId)) select.value = selectedId;
+  else if (categories.length) select.value = categories[0].id;
+}
+function slugifyCategory(name) {
+  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .replace(/đ/g, "d").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "loai-xe";
+}
+function renderCategories() {
+  const tbody = $("categoryRows");
+  if (!tbody) return;
+  tbody.replaceChildren();
+  categories.forEach(category => {
+    const tr = document.createElement("tr");
+    const count = products.filter(p => p.type === category.id).length;
+    const actions = document.createElement("td");
+    actions.appendChild(button("Sửa", "btn-light", () => editCategory(category.id)));
+    actions.appendChild(button("Xóa", "btn-danger", () => {
+      if (products.some(p => p.type === category.id)) {
+        alert("Không thể xóa danh mục đang có sản phẩm. Hãy chuyển các sản phẩm sang danh mục khác trước.");
+        return;
+      }
+      if (!confirm(`Bạn có chắc muốn xóa danh mục “${category.name}”?`)) return;
+      categories = categories.filter(c => c.id !== category.id);
+      writeData(KEYS.categories, categories);
+      renderCategoryOptions();
+      renderAll();
+    }));
+    tr.append(cell(category.name), cell(category.id), cell(count));
+    tr.appendChild(actions);
+    tbody.appendChild(tr);
+  });
+  if (!categories.length) {
+    const tr = document.createElement("tr");
+    const td = cell("Chưa có danh mục. Hãy thêm danh mục trước khi tạo sản phẩm.");
+    td.colSpan = 4; td.className = "empty"; tr.appendChild(td); tbody.appendChild(tr);
+  }
+}
+function resetCategoryForm(){
+  $("categoryForm").reset();
+  $("categoryId").value = "";
+  $("categoryFormTitle").textContent = "Thêm danh mục loại xe";
+  $("categorySubmit").textContent = "Thêm danh mục";
+}
+$("cancelCategoryEdit").addEventListener("click", resetCategoryForm);
+$("categoryForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const name = $("categoryName").value.trim();
+  const id = $("categoryId").value;
+  if (!name) return;
+  if (categories.some(c => c.name.toLocaleLowerCase("vi") === name.toLocaleLowerCase("vi") && c.id !== id)) {
+    alert("Tên danh mục đã tồn tại."); return;
+  }
+  if (id) {
+    const index = categories.findIndex(c => c.id === id);
+    if (index >= 0) categories[index] = {...categories[index], name};
+  } else {
+    const baseId = slugifyCategory(name);
+    let newId = baseId, suffix = 2;
+    while (categories.some(c => c.id === newId)) newId = `${baseId}-${suffix++}`;
+    categories.push({id:newId, name});
+  }
+  writeData(KEYS.categories, categories);
+  resetCategoryForm();
+  renderCategoryOptions();
+  renderAll();
+  alert(id ? "Đã cập nhật danh mục." : "Đã thêm danh mục.");
+});
+function editCategory(id){
+  const c=categories.find(x=>x.id===id); if(!c) return;
+  $("categoryId").value=c.id;
+  $("categoryName").value=c.name;
+  $("categoryFormTitle").textContent="Chỉnh sửa danh mục";
+  $("categorySubmit").textContent="Lưu thay đổi";
+  $("categoryForm").scrollIntoView({behavior:"smooth"});
+}
+
+let selectedImageData = "";
+
+function resetProductForm() {
+  $("productForm").reset();
+  $("productId").value = "";
+  $("productActive").checked = true;
+  $("productFormTitle").textContent = "Thêm sản phẩm mới";
+  $("productFeatured").checked = false;
+  selectedImageData = "";
+  $("imagePreview").classList.add("hidden");
+  $("imagePreview").removeAttribute("src");
+  $("productImageFile").value = "";
+}
+
+$("cancelProductEdit").addEventListener("click", resetProductForm);
+
+function compressImageFile(file, maxSize = 1600, quality = 0.78) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type.startsWith("image/")) {
+      reject(new Error("Vui lòng chọn một file hình ảnh."));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = event => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.naturalWidth;
+        let height = img.naturalHeight;
+        const scale = Math.min(1, maxSize / Math.max(width, height));
+        width = Math.max(1, Math.round(width * scale));
+        height = Math.max(1, Math.round(height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = () => reject(new Error("Không đọc được hình ảnh."));
+      img.src = event.target.result;
+    };
+    reader.onerror = () => reject(new Error("Không đọc được file hình ảnh."));
+    reader.readAsDataURL(file);
+  });
+}
+
+$("productImageFile").addEventListener("change", async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const data = await compressImageFile(file);
+    selectedImageData = data;
+    $("imagePreview").src = data;
+    $("imagePreview").classList.remove("hidden");
+  } catch (error) {
+    selectedImageData = "";
+    $("productImageFile").value = "";
+    alert(error.message || "Không thể tải hình ảnh.");
+  }
+});
+
+$("removeProductImage").addEventListener("click", () => {
+  selectedImageData = "";
+  $("productImageFile").value = "";
+  $("imagePreview").classList.add("hidden");
+  $("imagePreview").removeAttribute("src");
+});
+
+$("productForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const id = $("productId").value || "P" + Date.now();
+  const price = Number($("productPrice").value);
+  const existing = products.find(p => p.id === id);
+  const image = selectedImageData || existing?.image || "";
+
+  if (!Number.isFinite(price) || price <= 0) {
+    alert("Vui lòng nhập giá bán hợp lệ.");
+    return;
+  }
+
+  const product = {
+    id,
+    name: $("productName").value.trim(),
+    price,
+    type: $("productType").value,
+    year: $("productYear").value,
+    sku: $("productSku").value.trim(),
+    brand: $("productBrand").value.trim(),
+    condition: $("productCondition").value,
+    stock: Math.max(0, Number($("productStock").value || 0)),
+    color: $("productColor").value.trim(),
+    engine: $("productEngine").value.trim(),
+    image,
+    featured: $("productFeatured").checked,
+    description: $("productDescription").value.trim(),
+    active: $("productActive").checked
+  };
+
+  if (!product.name) return;
+
+  const index = products.findIndex(p => p.id === id);
+  if (index >= 0) products[index] = product;
+  else products.unshift(product);
+
+  try {
+    writeData(KEYS.products, products);
+  } catch (error) {
+    alert("Không thể lưu ảnh. Ảnh có thể quá lớn. Hãy chọn ảnh nhỏ hơn hoặc thử lại.");
+    return;
+  }
+  resetProductForm();
+  renderAll();
+  alert("Đã lưu sản phẩm và hình ảnh trên trình duyệt này.");
+});
+
+function editProduct(id) {
+  const p = products.find(item => item.id === id);
+  if (!p) return;
+  $("productId").value = p.id;
+  $("productName").value = p.name;
+  $("productPrice").value = p.price;
+  renderCategoryOptions(p.type || "other");
+  $("productYear").value = p.year || "";
+  $("productSku").value = p.sku || "";
+  $("productBrand").value = p.brand || "";
+  $("productCondition").value = p.condition || "new";
+  $("productStock").value = p.stock ?? 0;
+  $("productColor").value = p.color || "";
+  $("productEngine").value = p.engine || "";
+  $("productFeatured").checked = p.featured === true;
+  selectedImageData = p.image || "";
+  $("productImageFile").value = "";
+  $("productDescription").value = p.description || "";
+  $("productActive").checked = p.active !== false;
+  $("productFormTitle").textContent = "Chỉnh sửa sản phẩm";
+  if (p.image) {
+    $("imagePreview").src = p.image;
+    $("imagePreview").classList.remove("hidden");
+  } else {
+    $("imagePreview").classList.add("hidden");
+    $("imagePreview").removeAttribute("src");
+  }
+  $("productForm").scrollIntoView({behavior:"smooth"});
+}
+
+function deleteProduct(id) {
+  if (!confirm("Bạn có chắc muốn xóa sản phẩm này?")) return;
+  products = products.filter(p => p.id !== id);
+  writeData(KEYS.products, products);
+  renderAll();
+}
+
+function renderProducts() {
+  const tbody = $("productRows");
+  tbody.replaceChildren();
+  const q = $("productSearch").value.trim().toLowerCase();
+  const filtered = products.filter(p => text(p.name).toLowerCase().includes(q));
+
+  filtered.forEach(p => {
+    const tr = document.createElement("tr");
+    const imageTd = document.createElement("td");
+    imageTd.appendChild(imageElement(p.image, p.name));
+    tr.append(imageTd, cell(p.name), cell(p.sku || "-"), cell(categoryName(p.type)), cell(money(p.price)), cell(p.stock ?? 0));
+
+    const status = document.createElement("td");
+    const badge = document.createElement("span");
+    badge.className = "status " + (p.active !== false ? "status-done" : "status-cancel");
+    badge.textContent = p.active !== false ? "Đang bán" : "Đã ẩn";
+    status.appendChild(badge);
+    tr.appendChild(status);
+
+    const actions = document.createElement("td");
+    const group = document.createElement("div");
+    group.className = "actions";
+    group.append(
+      button("Sửa", "btn-light", () => editProduct(p.id)),
+      button("Xóa", "btn-danger", () => deleteProduct(p.id))
+    );
+    actions.appendChild(group);
+    tr.appendChild(actions);
+    tbody.appendChild(tr);
+  });
+
+  if (!filtered.length) {
+    const tr = document.createElement("tr");
+    const td = cell("Chưa có sản phẩm phù hợp.");
+    td.colSpan = 6;
+    td.className = "empty";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+}
+
+function orderTotal(order) {
+  return Number(order.total ?? order.totalAmount ?? 0);
+}
+
+function orderName(order) {
+  return order.customer?.name || order.name || "";
+}
+
+function orderPhone(order) {
+  return order.customer?.phone || order.phone || "";
+}
+
+function orderProducts(order) {
+  if (Array.isArray(order.items)) {
+    return order.items.map(i => `${i.name || i.productName || "Sản phẩm"} x ${i.qty || i.quantity || 1}`).join(", ");
+  }
+  if (Array.isArray(order.products)) {
+    return order.products.map(i => `${i.name || "Sản phẩm"} x ${i.qty || 1}`).join(", ");
+  }
+  return text(order.product || "Chưa có thông tin sản phẩm");
+}
+
+function orderDate(order) {
+  const raw = order.createdAt || order.date || order.created || "";
+  if (!raw) return "Chưa có ngày";
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? text(raw) : d.toLocaleDateString("vi-VN");
+}
+
+function statusClass(status) {
+  if (["completed", "completed", "Đã hoàn tất", "Hoàn tất"].includes(status)) return "status-done";
+  if (["cancelled", "cancel", "Đã hủy"].includes(status)) return "status-cancel";
+  return "status-new";
+}
+
+function statusLabel(status) {
+  const map = {
+    pending: "Chờ xác nhận",
+    confirmed: "Đã xác nhận",
+    shipping: "Đang giao",
+    completed: "Hoàn tất",
+    cancelled: "Đã hủy"
+  };
+  return map[status] || status || "Chờ xác nhận";
+}
+
+function renderOrders() {
+  const tbody = $("orderRows");
+  tbody.replaceChildren();
+  const q = $("orderSearch").value.trim().toLowerCase();
+
+  const filtered = orders.filter(o => [
+    o.id, o.orderId, orderName(o), orderPhone(o)
+  ].some(v => text(v).toLowerCase().includes(q)));
+
+  filtered.forEach((o, index) => {
+    const id = o.id || o.orderId || ("DH" + (index + 1));
+    const tr = document.createElement("tr");
+    tr.append(cell(id), cell(orderName(o) || "Chưa có tên"),
+      cell(orderProducts(o)), cell(money(orderTotal(o))), cell(orderDate(o)));
+
+    const statusTd = document.createElement("td");
+    const select = document.createElement("select");
+    [
+      ["pending","Chờ xác nhận"],
+      ["confirmed","Đã xác nhận"],
+      ["shipping","Đang giao"],
+      ["completed","Hoàn tất"],
+      ["cancelled","Đã hủy"]
+    ].forEach(([value,label]) => {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = label;
+      select.appendChild(opt);
+    });
+    select.value = ["pending","confirmed","shipping","completed","cancelled"].includes(o.status)
+      ? o.status : "pending";
+    select.addEventListener("change", () => {
+      const realIndex = orders.findIndex(item =>
+        (item.id || item.orderId) === (o.id || o.orderId)
+      );
+      if (realIndex >= 0) {
+        orders[realIndex].status = select.value;
+        writeData(KEYS.orders, orders);
+        renderAll();
+      }
+    });
+    statusTd.appendChild(select);
+    tr.appendChild(statusTd);
+
+    const actionTd = document.createElement("td");
+    actionTd.appendChild(button("Chi tiết", "btn-light", () => showOrderDetail(o)));
+    tr.appendChild(actionTd);
+    tbody.appendChild(tr);
+  });
+
+  if (!filtered.length) {
+    const tr = document.createElement("tr");
+    const td = cell("Chưa có đơn hàng.");
+    td.colSpan = 7;
+    td.className = "empty";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+
+  const recent = $("recentOrders");
+  recent.replaceChildren();
+  orders.slice().reverse().slice(0,5).forEach((o,index) => {
+    const tr = document.createElement("tr");
+    tr.append(
+      cell(o.id || o.orderId || ("DH" + (index + 1))),
+      cell(orderName(o) || "Chưa có tên"),
+      cell(orderDate(o)),
+      cell(money(orderTotal(o)))
+    );
+    const td = document.createElement("td");
+    const badge = document.createElement("span");
+    badge.className = "status " + statusClass(o.status);
+    badge.textContent = statusLabel(o.status);
+    td.appendChild(badge);
+    tr.appendChild(td);
+    recent.appendChild(tr);
+  });
+
+  if (!orders.length) {
+    const tr = document.createElement("tr");
+    const td = cell("Chưa có đơn hàng.");
+    td.colSpan = 5;
+    td.className = "empty";
+    tr.appendChild(td);
+    recent.appendChild(tr);
+  }
+}
+
+function showOrderDetail(o) {
+  const panel = $("orderDetailPanel");
+  const target = $("orderDetail");
+  target.replaceChildren();
+
+  const details = [
+    ["Mã đơn", o.id || o.orderId || ""],
+    ["Họ tên", orderName(o)],
+    ["Số điện thoại", orderPhone(o)],
+    ["Email", o.customer?.email || o.email || ""],
+    ["Địa chỉ", o.customer?.address || o.address || ""],
+    ["Sản phẩm", orderProducts(o)],
+    ["Tổng tiền", money(orderTotal(o))],
+    ["Thanh toán", o.payment || ""],
+    ["Ghi chú", o.note || ""],
+    ["Ngày tạo", orderDate(o)],
+    ["Trạng thái", statusLabel(o.status)]
+  ];
+
+  details.forEach(([label,value]) => {
+    const p = document.createElement("p");
+    const strong = document.createElement("strong");
+    strong.textContent = label + ": ";
+    p.append(strong, document.createTextNode(text(value)));
+    target.appendChild(p);
+  });
+
+  panel.classList.remove("hidden");
+  panel.scrollIntoView({behavior:"smooth"});
+}
+
+$("closeOrderDetail").addEventListener("click", () => {
+  $("orderDetailPanel").classList.add("hidden");
+});
+
+function renderCustomers() {
+  const tbody = $("customerRows");
+  tbody.replaceChildren();
+  const customerMap = new Map();
+  orders.forEach(o => {
+    const phone = orderPhone(o);
+    const key = phone || orderName(o) || "unknown";
+    if (!customerMap.has(key)) {
+      customerMap.set(key, {
+        name: orderName(o),
+        phone,
+        email: o.customer?.email || o.email || "",
+        address: o.customer?.address || o.address || "",
+        count: 0
+      });
+    }
+    customerMap.get(key).count++;
+  });
+
+  const q = $("customerSearch").value.trim().toLowerCase();
+  const customers = [...customerMap.values()].filter(c =>
+    [c.name,c.phone,c.email,c.address].some(v => text(v).toLowerCase().includes(q))
+  );
+
+  customers.forEach(c => {
+    const tr = document.createElement("tr");
+    tr.append(cell(c.name), cell(c.phone), cell(c.email), cell(c.address), cell(c.count));
+    tbody.appendChild(tr);
+  });
+
+  if (!customers.length) {
+    const tr = document.createElement("tr");
+    const td = cell("Chưa có thông tin khách hàng.");
+    td.colSpan = 5;
+    td.className = "empty";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+}
+
+function resetCouponForm() {
+  $("couponForm").reset();
+  $("couponId").value = "";
+  $("couponFormTitle").textContent = "Tạo mã giảm giá";
+  $("couponMin").value = "0";
+}
+
+$("cancelCouponEdit").addEventListener("click", resetCouponForm);
+
+$("couponForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const id = $("couponId").value || "C" + Date.now();
+  const code = $("couponCode").value.trim().toUpperCase();
+  const type = $("couponType").value;
+  const value = Number($("couponValue").value);
+  const min = Number($("couponMin").value || 0);
+  const usage = $("couponUsage").value ? Number($("couponUsage").value) : null;
+
+  if (!code || value <= 0 || min < 0) {
+    alert("Vui lòng kiểm tra thông tin mã giảm giá.");
+    return;
+  }
+  if (type === "percent" && value > 100) {
+    alert("Giảm giá phần trăm không được vượt quá 100%.");
+    return;
+  }
+
+  const duplicate = coupons.some(c => c.code === code && c.id !== id);
+  if (duplicate) {
+    alert("Mã giảm giá này đã tồn tại.");
+    return;
+  }
+
+  const coupon = {
+    id, code, type, value, min,
+    expiry: $("couponExpiry").value,
+    usage,
+    used: coupons.find(c => c.id === id)?.used || 0
+  };
+
+  const index = coupons.findIndex(c => c.id === id);
+  if (index >= 0) coupons[index] = coupon;
+  else coupons.unshift(coupon);
+
+  writeData(KEYS.coupons, coupons);
+  resetCouponForm();
+  renderAll();
+  alert("Đã lưu mã giảm giá trên trình duyệt này.");
+});
+
+function editCoupon(id) {
+  const c = coupons.find(item => item.id === id);
+  if (!c) return;
+  $("couponId").value = c.id;
+  $("couponCode").value = c.code;
+  $("couponType").value = c.type;
+  $("couponValue").value = c.value;
+  $("couponMin").value = c.min || 0;
+  $("couponExpiry").value = c.expiry || "";
+  $("couponUsage").value = c.usage ?? "";
+  $("couponFormTitle").textContent = "Chỉnh sửa mã giảm giá";
+  $("couponForm").scrollIntoView({behavior:"smooth"});
+}
+
+function deleteCoupon(id) {
+  if (!confirm("Xóa mã giảm giá này?")) return;
+  coupons = coupons.filter(c => c.id !== id);
+  writeData(KEYS.coupons, coupons);
+  renderAll();
+}
+
+function renderCoupons() {
+  const tbody = $("couponRows");
+  tbody.replaceChildren();
+  coupons.forEach(c => {
+    const tr = document.createElement("tr");
+    tr.append(
+      cell(c.code),
+      cell(c.type === "percent" ? "Phần trăm" : "Tiền cố định"),
+      cell(c.type === "percent" ? c.value + "%" : money(c.value)),
+      cell(money(c.min)),
+      cell(c.expiry || "Không giới hạn"),
+      cell((c.used || 0) + " / " + (c.usage ?? "Không giới hạn"))
+    );
+    const td = document.createElement("td");
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    actions.append(
+      button("Sửa", "btn-light", () => editCoupon(c.id)),
+      button("Xóa", "btn-danger", () => deleteCoupon(c.id))
+    );
+    td.appendChild(actions);
+    tr.append(td);
+    tbody.appendChild(tr);
+  });
+
+  if (!coupons.length) {
+    const tr = document.createElement("tr");
+    const td = cell("Chưa có mã giảm giá.");
+    td.colSpan = 7;
+    td.className = "empty";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+}
+
+function renderOverview() {
+  $("statProducts").textContent = products.length;
+  $("statOrders").textContent = orders.length;
+  $("statCustomers").textContent = new Set(
+    orders.map(o => orderPhone(o) || orderName(o)).filter(Boolean)
+  ).size;
+  const revenue = orders.reduce((sum, o) => {
+    return ["completed", "Đã hoàn tất", "Hoàn tất"].includes(o.status)
+      ? sum + orderTotal(o) : sum;
+  }, 0);
+  $("statRevenue").textContent = money(revenue);
+}
+
+function renderAll() {
+  renderCategoryOptions($("productType")?.value);
+  renderCategories();
+  renderProducts();
+  renderPosts();
+  renderOrders();
+  renderCustomers();
+  renderCoupons();
+  renderOverview();
+}
+
+$("productSearch").addEventListener("input", renderProducts);
+$("postSearch").addEventListener("input", renderPosts);
+$("orderSearch").addEventListener("input", renderOrders);
+$("customerSearch").addEventListener("input", renderCustomers);
+
+renderAll();
+window.addEventListener("storage", event => {
+  if ([KEYS.products, KEYS.orders, KEYS.coupons, KEYS.categories, KEYS.news].includes(event.key)) {
+    products = readData(KEYS.products);
+    orders = readData(KEYS.orders);
+    coupons = readData(KEYS.coupons);
+    categories = readData(KEYS.categories);
+    posts = readData(KEYS.news);
+    renderAll();
+  }
+});
+</script>
+</body>
+</html>
